@@ -8,6 +8,7 @@ Nhóm **commit** các file do công cụ của lab sinh ra. Đây là bằng ch�
 | --- | --- | --- |
 | `benchmark.json` | `python -m lab8.benchmark --shapes workflow,single,orchestrator,swarm --cases data/public_claims.jsonl --seeds 11,22,33,44,55 --out reports/benchmark.json` | Có |
 | `crash.json` | `python -m lab8.crash_test --count 20 --out reports/crash.json` | Có |
+| `research_ablation.json` | `python -m lab8.benchmark --shapes workflow,workflow_draft --extra-shape workflow_draft=bonus.workflow_draft:run_claim --cases data/public_claims.jsonl --seeds 11,22,33,44,55 --out reports/research_ablation.json` | Bằng chứng cho research card |
 | `hidden_selfcheck.json` | benchmark trên `student_drop/` (xem `src/README.md`, mục Tự kiểm trên bộ hidden) | Không |
 | `bonus_*.json` | script bonus của nhóm | Chỉ khi làm bonus |
 

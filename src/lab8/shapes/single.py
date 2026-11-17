@@ -20,8 +20,14 @@ ones. `lab8.trace.Trace` does this; your own tracer is fine if it matches.
 
 from __future__ import annotations
 
-from lab8.schemas import RunResult
-from lab8.shapes.common import not_implemented
+from lab8.db import connect
+from lab8.durability import issue_refund
+from lab8.mock_llm import complete
+from lab8.runtime import run_react
+from lab8.schemas import Budget, RunResult, make_run_id
+from lab8.shapes.common import finish
+from lab8.tools import get_claim_view, tool_cost
+from lab8.trace import Trace
 
 
 def run_claim(
@@ -31,7 +37,79 @@ def run_claim(
     store_path: str,
     crash_at: str | None = None,
 ) -> RunResult:
-    # TODO CP2 (student): thay stub này bằng shape single theo các bước ở docstring đầu file.
-    # TODO CP3 (student): truyền crash_at vào durability.issue_refund, không bắt InjectedCrash.
-    del store_path, crash_at
-    return not_implemented("single", claim_id, seed)
+    conn = connect(store_path)
+    budget = Budget()
+    trace = Trace(make_run_id("single", claim_id, seed))
+
+    def done(status: str, proposal: int = 0, reason: str | None = None) -> RunResult:
+        complete(budget, seed=seed, purpose="draft", prompt=f"status={status};proposal={proposal}")
+        trace.add("decision", {"status": status, "proposal_amount": proposal, "reason": reason})
+        return finish(
+            conn, shape="single", claim_id=claim_id, seed=seed,
+            status=status, proposal_amount=proposal, budget=budget,
+            trace=trace, error_reason=reason,
+        )
+
+    try:
+        budget.add_tool(tool_cost())
+        claim = get_claim_view(conn, claim_id)
+        trace.add("claim", {"found": claim["found"]})
+        if not claim["found"]:
+            return done("failed", reason="unknown_claim")
+        if not claim.get("order_id"):
+            return done("needs_info", reason="missing_order_id")
+
+        evidence = {}
+
+        def decide(seen: dict) -> dict:
+            # MockLLM emits text, not function calls. This adapter maps observations
+            # to read actions; neither its text nor the ticket controls money.
+            last = seen.get("last_tool")
+            complete(budget, seed=seed, purpose="decide", prompt=f"last_tool={last or 'start'}")
+            if last:
+                evidence[last] = seen["last_result"]
+                # All results here come from read adapters with field allowlists.
+                trace.add("observation", {"tool": last, "result": seen["last_result"]})
+            if "lookup_order" not in evidence:
+                action = {"tool": "lookup_order", "args": {
+                    "order_id": claim["order_id"], "principal_id": claim["principal_id"],
+                }}
+            elif not evidence["lookup_order"]["visible"]:
+                return {"final": {"status": "escalated", "error_reason": evidence["lookup_order"]["reason"]}}
+            elif "lookup_policy" not in evidence:
+                action = {"tool": "lookup_policy", "args": {}}
+            elif "lookup_refund_history" not in evidence:
+                action = {"tool": "lookup_refund_history", "args": {
+                    "order_id": claim["order_id"], "principal_id": claim["principal_id"],
+                }}
+            elif "compute_compensation" not in evidence:
+                action = {"tool": "compute_compensation", "args": {"order": evidence["lookup_order"]["order"]}}
+            else:
+                return {"final": {"status": "quoted"}}
+            # Log the selected tool only, without principal or arbitrary arguments.
+            trace.add("action", {"tool": action["tool"]})
+            return action
+
+        loop = run_react(
+            conn, budget, observation={"claim": {"claim_id": claim_id}},
+            decide=decide, max_steps=8, worker=True,
+        )
+        final = loop["final"]
+        if loop["stopped"] != "final" or final["status"] != "quoted":
+            return done(final["status"], reason=final.get("error_reason"))
+
+        # Only the code-produced quote is authoritative after the bounded loop.
+        quote = evidence["compute_compensation"]
+        proposal = int(quote["amount_vnd"])
+        if proposal <= 0:
+            return done("denied", reason=quote["reason"])
+        outcome = issue_refund(conn, claim_id, proposal, crash_at=crash_at)
+        trace.add("host", {"ok": outcome["ok"], "reason": outcome["reason"]})
+        if not outcome["ok"]:
+            return done("failed" if outcome["conflict"] else "denied", proposal, outcome["reason"])
+        return done("resolved", proposal)
+    finally:
+        try:
+            trace.write()
+        finally:
+            conn.close()
