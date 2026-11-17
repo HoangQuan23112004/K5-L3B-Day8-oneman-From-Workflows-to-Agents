@@ -5,7 +5,7 @@
 - Nhóm: Oneman, một thành viên.
 - Thành viên: Hoàng Dương Anh Quân, MSSV 2A202603735, email 26ai.quanhda@vinuni.edu.vn, GitHub HoangQuan23112004.
 - Báo cáo cá nhân: [2A202603735_HoangDuongAnhQuan.md](2A202603735_HoangDuongAnhQuan.md).
-- Commit chốt: chưa tạo; hash sẽ được cập nhật sau khi commit.
+- Commit triển khai: 098fa7f3673112465f32262f1bfe12764600d24e (nhánh main).
 
 ## 2. Mục tiêu và cách tiếp cận
 

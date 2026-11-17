@@ -3,11 +3,11 @@
 ## Thông tin nhóm
 
 - Tên nhóm: Oneman
-- Lớp: L3B (theo tên repository; xác nhận quy ước lớp với giảng viên vì đề mẫu ghi L3A).
+- Lớp: L3B 
 - Hình thức: một thành viên (làm bài một mình).
 - Repo nhóm: `K5-L3B-Day8-oneman-From-Workflows-to-Agents`
 - URL repo: https://github.com/HoangQuan23112004/K5-L3B-Day8-oneman-From-Workflows-to-Agents
-- Nhánh nộp, commit chốt: chưa chốt; hash sẽ được cập nhật sau khi commit.
+- Nhánh nộp: main; commit triển khai: 098fa7f3673112465f32262f1bfe12764600d24e.
 - Họ tên: Hoàng Dương Anh Quân
 - MSSV: 2A202603735
 - Email: 26ai.quanhda@vinuni.edu.vn
@@ -30,7 +30,7 @@ Gợi ý chia vai:
 
 | Người | Vai | Commit | Test đã thêm hoặc sửa |
 | --- | --- | --- | --- |
-| Hoàng Dương Anh Quân | Phụ trách toàn bộ dự án: ba shape, kiểm thử, benchmark, ablation và báo cáo | Chưa commit; cập nhật hash sau khi commit | src/tests/test_shape_safety.py: crash/resume, unknown claim, injection, giới hạn ReAct và ablation |
+| Hoàng Dương Anh Quân | Phụ trách toàn bộ dự án: ba shape, kiểm thử, benchmark, ablation và báo cáo | 098fa7f | src/tests/test_shape_safety.py: crash/resume, unknown claim, injection, giới hạn ReAct và ablation |
 
 ## Cá nhân
 

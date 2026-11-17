@@ -34,7 +34,7 @@ def main() -> None:
     adr = f"""# Decision record
 
 - Shape chọn: workflow
-- Commit hash: chưa tạo commit triển khai; cần cập nhật hash thật sau khi review và commit.
+- Commit hash: 098fa7f3673112465f32262f1bfe12764600d24e (nhánh main).
 - Run id dẫn chứng: {run_id} (src/reports/benchmark.json).
 - Pass rate / pass^5 / seed min-max / variance: {workflow['pass_rate']:.6f} / {workflow['pass_5']:.6f} / {workflow['seed_min']:.6f}–{workflow['seed_max']:.6f} / {workflow['seed_variance']:.9f}.
 - Cost per success (mô phỏng, VND): {workflow['cost_per_success_vnd']:.6f}.
@@ -80,7 +80,7 @@ Steps là số event trace và không phải số vòng ReAct hay thời gian th
 khác độ chi tiết logging làm so sánh steps giữa shape có giới hạn.
 Benchmark public chạy DB mới cho mỗi trial; retry/crash là các test riêng.
 Chưa nhận student_drop nên chưa thể kết luận đạt ngưỡng hidden.
-Các số là dữ liệu sinh từ công cụ, không chỉnh JSON. Commit nộp chưa chốt.
+Các số là dữ liệu sinh từ công cụ, không chỉnh JSON. Commit triển khai: 098fa7f.
 """
     card = f"""# Research card
 
@@ -119,7 +119,7 @@ Lệnh đã chạy từ src/:
 - Nhóm: Oneman, một thành viên.
 - Thành viên: Hoàng Dương Anh Quân, MSSV 2A202603735, email 26ai.quanhda@vinuni.edu.vn, GitHub HoangQuan23112004.
 - Báo cáo cá nhân: [2A202603735_HoangDuongAnhQuan.md](2A202603735_HoangDuongAnhQuan.md).
-- Commit chốt: chưa tạo; hash sẽ được cập nhật sau khi commit.
+- Commit triển khai: 098fa7f3673112465f32262f1bfe12764600d24e (nhánh main).
 
 ## 2. Mục tiêu và cách tiếp cận
 
